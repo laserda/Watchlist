@@ -3,6 +3,7 @@ namespace Watchlist.Models
 {
     public class MovieViewModel
     {
+        public string UserId { get; set; }
         public int MovieId { get; set; }
         public string Title { get; set; }
         public int Year { get; set; }

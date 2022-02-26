@@ -3,6 +3,8 @@ using System.Threading.Tasks;
 using Watchlist.Data;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using Watchlist.Models;
+using System;
 
 namespace Watchlist.Repositories
 {
@@ -58,9 +60,23 @@ namespace Watchlist.Repositories
         /// <param name="userId">L'Id de l'utilisateur</param>
         /// <returns>List de UserMovie</returns>
 
-        public async Task<IEnumerable<UserMovie>> GetUserMovieAsync(string userId)
+        public IEnumerable<MovieViewModel> GetUserMovieAsync(string userId)
         {
-            return await _context.UserMovies.Where(um => um.UserId == userId).ToListAsync();
+            var userMovies = _context.UserMovies.Select(x => new MovieViewModel
+            {
+                UserId = x.UserId,
+                MovieId = x.MovieId,
+                Title = x.Movie.Title,
+                Year = x.Movie.Year,
+                Watched = x.Watched,
+                InWatchlist = true,
+                Rating = x.Rating
+            });
+
+            var model = userMovies.Where(u => u.UserId == userId).ToList();
+
+
+            return model;
         }
         /// <summary>
         /// Pour récupérer une film en fonction de l'utilisateur connecter

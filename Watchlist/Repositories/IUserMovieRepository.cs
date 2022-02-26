@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Watchlist.Data;
 using System.Collections.Generic;
+using Watchlist.Models;
 
 namespace Watchlist.Repositories
 {
@@ -9,7 +10,7 @@ namespace Watchlist.Repositories
         Task CreateAsync(UserMovie userMovie);
         Task DeleteAsync(UserMovie userMovie);
         bool GetUserInWatchlist(Movie x, string userId);
-        Task<IEnumerable<UserMovie>> GetUserMovieAsync(string userId);
+        IEnumerable<MovieViewModel> GetUserMovieAsync(string userId);
         Task<UserMovie> GetUserMovieAsync(string userId, int movieId);
     }
 }

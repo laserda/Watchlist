@@ -6,6 +6,7 @@ using Watchlist.Repositories;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Linq;
+using Watchlist.Models;
 
 namespace WatchlistTests
 {
@@ -129,11 +130,12 @@ namespace WatchlistTests
             await CreateUserMovie();
 
             //Act
-            var result = await _userMovieRepository.GetUserMovieAsync(_userList[0]);
+            var result = _userMovieRepository.GetUserMovieAsync(_userList[0]);
 
             //Assert
-            Assert.IsAssignableFrom<IEnumerable<UserMovie>>(result);
+            //Assert.IsAssignableFrom<IEnumerable<MovieViewModel>>(result);
             Assert.Equal(3, result.ToList().Count);
+            //Assert.Equal("user1", _userList[0]);
         }
 
         [Fact]
@@ -178,12 +180,14 @@ namespace WatchlistTests
             await _userMovieRepository.DeleteAsync(userMovie);
 
             //Act
-            var result = await _userMovieRepository.GetUserMovieAsync(_userList[0]);
-            var result2 = await _userMovieRepository.GetUserMovieAsync(_userList[2]);
+            var result = _userMovieRepository.GetUserMovieAsync(_userList[0]);
+            var result2 = _userMovieRepository.GetUserMovieAsync(_userList[2]);
 
             //Assert
-            Assert.IsAssignableFrom<IEnumerable<UserMovie>>(result);
+            Assert.IsAssignableFrom<IEnumerable<MovieViewModel>>(result);
             Assert.Equal(2, result.ToList().Count);
+
+            Assert.IsAssignableFrom<IEnumerable<MovieViewModel>>(result2);
             Assert.Equal(4, result2.ToList().Count);
         }
 

@@ -6,21 +6,22 @@ using System.Threading.Tasks;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Watchlist.Services;
+using Watchlist.Repositories;
 
 namespace Watchlist.Controllers
 {
     [Authorize]
     public class WatchlistController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IUserMovieRepository _userMovieRepository;
         private readonly IUserService _userService;
 
         public WatchlistController(
-            ApplicationDbContext context,
+            IUserMovieRepository userMovieRepository,
             IUserService userService
         )
         {
-            _context = context;
+            _userMovieRepository = userMovieRepository;
             _userService = userService;
         }
 
@@ -29,19 +30,20 @@ namespace Watchlist.Controllers
         {
             var id = await _userService.GetCurrentUserIdAsync(HttpContext);
 
-            var userMovies = _context.UserMovies.Where(u => u.UserId == id);
+            //var userMovies = _context.UserMovies.Select(x => new MovieViewModel
+            //{
+            //    UserId = x.UserId,
+            //    MovieId = x.MovieId,
+            //    Title = x.Movie.Title,
+            //    Year = x.Movie.Year,
+            //    Watched = x.Watched,
+            //    InWatchlist = true,
+            //    Rating = x.Rating
+            //});
 
-            var model = userMovies.Select(x => new MovieViewModel
-            {
-                MovieId = x.MovieId,
-                Title = x.Movie.Title,
-                Year = x.Movie.Year,
-                Watched = x.Watched,
-                InWatchlist = true,
-                Rating = x.Rating
-            }).ToList();
+            //var model = userMovies.Where(u => u.UserId == id).ToList();
 
-            return View(model);
+            return View(_userMovieRepository.GetUserMovieAsync(id));
         }
     }
 }
