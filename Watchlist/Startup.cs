@@ -15,6 +15,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Watchlist.Data;
+using Watchlist.Repositories;
 using Watchlist.Services;
 
 namespace Watchlist
@@ -32,6 +33,7 @@ namespace Watchlist
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddTransient<IUserService, UserService>();
+            services.AddTransient<IUserMovieRepository, UserMovieRepository>();
 
             services.AddLocalization(opts => { opts.ResourcesPath = "Resources"; });
 
