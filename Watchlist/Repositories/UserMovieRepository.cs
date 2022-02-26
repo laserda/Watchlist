@@ -60,9 +60,9 @@ namespace Watchlist.Repositories
         /// <param name="userId">L'Id de l'utilisateur</param>
         /// <returns>List de UserMovie</returns>
 
-        public IEnumerable<MovieViewModel> GetUserMovieAsync(string userId)
+        public IEnumerable<UserMovieViewModel> GetUserMovieAsync(string userId)
         {
-            var userMovies = _context.UserMovies.Select(x => new MovieViewModel
+            var userMovies = _context.UserMovies.Select(x => new UserMovieViewModel
             {
                 UserId = x.UserId,
                 MovieId = x.MovieId,

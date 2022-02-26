@@ -1,7 +1,7 @@
 ﻿
 namespace Watchlist.Models
 {
-    public class MovieViewModel
+    public class UserMovieViewModel
     {
         public string UserId { get; set; }
         public int MovieId { get; set; }

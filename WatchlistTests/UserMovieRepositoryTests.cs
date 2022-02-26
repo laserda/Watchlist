@@ -184,10 +184,10 @@ namespace WatchlistTests
             var result2 = _userMovieRepository.GetUserMovieAsync(_userList[2]);
 
             //Assert
-            Assert.IsAssignableFrom<IEnumerable<MovieViewModel>>(result);
+            Assert.IsAssignableFrom<IEnumerable<UserMovieViewModel>>(result);
             Assert.Equal(2, result.ToList().Count);
 
-            Assert.IsAssignableFrom<IEnumerable<MovieViewModel>>(result2);
+            Assert.IsAssignableFrom<IEnumerable<UserMovieViewModel>>(result2);
             Assert.Equal(4, result2.ToList().Count);
         }
 

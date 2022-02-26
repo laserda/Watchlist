@@ -34,7 +34,7 @@ namespace Watchlist.Controllers
         {
             var userId = await _userService.GetCurrentUserIdAsync(HttpContext);
             var movies = await _context.Movies.ToListAsync();
-            var model = movies.Select(x => new MovieViewModel
+            var model = movies.Select(x => new UserMovieViewModel
             {
                 MovieId = x.Id,
                 Title = x.Title,
