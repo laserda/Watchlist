@@ -1,0 +1,50 @@
+﻿@model IEnumerable<Watchlist.Models.MovieViewModel>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Watch list</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Title)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Year)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.InWatchlist)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Watched)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Rating)
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Title)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Year)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.InWatchlist)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Watched)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Rating)
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
