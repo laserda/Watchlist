@@ -34,6 +34,7 @@ namespace Watchlist
         {
             services.AddTransient<IUserService, UserService>();
             services.AddTransient<IUserMovieRepository, UserMovieRepository>();
+            services.AddTransient<IMovieRepository, MovieRepository>();
 
             services.AddLocalization(opts => { opts.ResourcesPath = "Resources"; });
 
