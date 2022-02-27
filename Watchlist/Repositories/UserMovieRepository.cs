@@ -60,22 +60,25 @@ namespace Watchlist.Repositories
         /// <param name="userId">L'Id de l'utilisateur</param>
         /// <returns>List de UserMovie</returns>
 
-        public IEnumerable<UserMovieViewModel> GetUserMovieAsync(string userId)
+        public async Task<IEnumerable<UserMovieViewModel>> GetUserMovieAsync(string userId)
         {
-            var userMovies = _context.UserMovies.Select(x => new UserMovieViewModel
-            {
-                UserId = x.UserId,
-                MovieId = x.MovieId,
-                Title = x.Movie.Title,
-                Year = x.Movie.Year,
-                Watched = x.Watched,
-                InWatchlist = true,
-                Rating = x.Rating
-            });
-
-            var model = userMovies.Where(u => u.UserId == userId).ToList();
+            var userMovies = await _context.UserMovies.Where(u => u.UserId == userId).ToListAsync();
 
 
+            var model = (from u in userMovies
+                         join m in _context.Movies on u.MovieId equals m.Id
+                         select new UserMovieViewModel
+                         {
+                             UserId = u.UserId,
+                            MovieId = m.Id,
+                            Title = m.Title,
+                            Year = m.Year,
+                            Watched = u.Watched,
+                            InWatchlist = true,
+                            Rating = u.Rating
+                        }).ToList();
+
+            
             return model;
         }
         /// <summary>

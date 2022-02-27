@@ -10,7 +10,7 @@ namespace Watchlist.Repositories
         Task CreateAsync(UserMovie userMovie);
         Task DeleteAsync(UserMovie userMovie);
         bool GetUserInWatchlist(Movie x, string userId);
-        IEnumerable<UserMovieViewModel> GetUserMovieAsync(string userId);
+        Task<IEnumerable<UserMovieViewModel>> GetUserMovieAsync(string userId);
         Task<UserMovie> GetUserMovieAsync(string userId, int movieId);
     }
 }

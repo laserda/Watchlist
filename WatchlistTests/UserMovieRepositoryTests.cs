@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Linq;
 using Watchlist.Models;
+using Watchlist.Services;
+using Moq;
 
 namespace WatchlistTests
 {
@@ -14,6 +16,12 @@ namespace WatchlistTests
     {
         private readonly ApplicationDbContext _context;
         private readonly UserMovieRepository _userMovieRepository;
+        public readonly MovieRepository _movieRepository;
+
+
+        private readonly Mock<IUserService> _userServiceMock = new Mock<IUserService>();
+        private readonly Mock<IUserMovieRepository> _userMovieRepositoryMock = new Mock<IUserMovieRepository>();
+
         private readonly string[] _userList = new string[] { "user1", "user2", "user3" };
 
         public UserMovieRepositoryTests()
@@ -26,6 +34,8 @@ namespace WatchlistTests
             _context.Database.EnsureCreated();
 
             _userMovieRepository = new UserMovieRepository(_context);
+
+            _movieRepository = new MovieRepository(_context, _userMovieRepositoryMock.Object, _userServiceMock.Object);
         }
 
         public void Dispose()
@@ -34,9 +44,43 @@ namespace WatchlistTests
             _context.Dispose();
         }
 
+        private async Task CreateMovie()
+        {
 
+            await _movieRepository.CreateAsync(new Movie
+            {
+                Id = 1,
+                Title = "Koman",
+                Year = 2021
+            });
+
+            await _movieRepository.CreateAsync(new Movie
+            {
+                Id = 2,
+                Title = "Igor",
+                Year = 2020
+            });
+
+            await _movieRepository.CreateAsync(new Movie
+            {
+                Id = 3,
+                Title = "Atsé",
+                Year = 2019
+            });
+
+
+
+            await _movieRepository.CreateAsync(new Movie
+            {
+                Id = 4,
+                Title = "Atsé",
+                Year = 2019
+            });
+        }
         private async Task CreateUserMovie()
         {
+
+            await CreateMovie();
 
             var userMovies = new List<UserMovie>()
             {
@@ -130,12 +174,12 @@ namespace WatchlistTests
             await CreateUserMovie();
 
             //Act
-            var result = _userMovieRepository.GetUserMovieAsync(_userList[0]);
+            var result = await _userMovieRepository.GetUserMovieAsync(_userList[0]);
 
             //Assert
-            //Assert.IsAssignableFrom<IEnumerable<MovieViewModel>>(result);
+            Assert.IsAssignableFrom<IEnumerable<UserMovieViewModel>>(result);
             Assert.Equal(3, result.ToList().Count);
-            //Assert.Equal("user1", _userList[0]);
+            
         }
 
         [Fact]
@@ -180,8 +224,8 @@ namespace WatchlistTests
             await _userMovieRepository.DeleteAsync(userMovie);
 
             //Act
-            var result = _userMovieRepository.GetUserMovieAsync(_userList[0]);
-            var result2 = _userMovieRepository.GetUserMovieAsync(_userList[2]);
+            var result = await _userMovieRepository.GetUserMovieAsync(_userList[0]);
+            var result2 =await  _userMovieRepository.GetUserMovieAsync(_userList[2]);
 
             //Assert
             Assert.IsAssignableFrom<IEnumerable<UserMovieViewModel>>(result);

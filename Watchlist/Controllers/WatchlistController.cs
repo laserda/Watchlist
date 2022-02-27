@@ -43,7 +43,7 @@ namespace Watchlist.Controllers
 
             //var model = userMovies.Where(u => u.UserId == id).ToList();
 
-            return View(_userMovieRepository.GetUserMovieAsync(id));
+            return View(await _userMovieRepository.GetUserMovieAsync(id));
         }
     }
 }
