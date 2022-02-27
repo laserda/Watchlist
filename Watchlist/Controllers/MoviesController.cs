@@ -10,21 +10,26 @@ using Microsoft.AspNetCore.Authorization;
 using Watchlist.Models;
 using Microsoft.AspNetCore.Identity;
 using Watchlist.Services;
+using Watchlist.Repositories;
 
 namespace Watchlist.Controllers
 {
     public class MoviesController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IMovieRepository _movieRepository;
+        private readonly IUserMovieRepository _userMovieRepository;
         private readonly IUserService _userService;
 
         public MoviesController(
-            ApplicationDbContext context,
+            IMovieRepository movieRepository,
+            IUserMovieRepository userMovieRepository,
             IUserService userService
         )
         {
-            _context = context;
+            _movieRepository = movieRepository;
             _userService = userService;
+            _userMovieRepository = userMovieRepository;
+             
         }
 
 
@@ -32,16 +37,7 @@ namespace Watchlist.Controllers
         [Authorize]
         public async Task<IActionResult> Index()
         {
-            var userId = await _userService.GetCurrentUserIdAsync(HttpContext);
-            var movies = await _context.Movies.ToListAsync();
-            var model = movies.Select(x => new UserMovieViewModel
-            {
-                MovieId = x.Id,
-                Title = x.Title,
-                Year = x.Year,
-                InWatchlist =(_context.UserMovies.FirstOrDefault(u => u.MovieId == x.Id && u.UserId == userId) != null ? true : false) 
-            });
-            return View(model);
+            return View(await _movieRepository.GetMoviesAsync(HttpContext));
         }
 
 
@@ -56,10 +52,10 @@ namespace Watchlist.Controllers
                 // if a record exists in UserMovies that contains both the user’s
                 // and movie’s Ids, then the movie is in the watchlist and can
                 // be removed
-                var movie = _context.UserMovies.FirstOrDefault(x => x.MovieId == id && x.UserId == userId);
+                var movie = await _userMovieRepository.GetUserMovieAsync(userId, id);
                 if (movie != null)
                 {
-                    _context.UserMovies.Remove(movie);
+                    await _userMovieRepository.DeleteAsync(movie);
                     retval = 0;
                 }
 
@@ -68,7 +64,7 @@ namespace Watchlist.Controllers
             {
                 // the movie is not currently in the watchlist, so we need to
                 // build a new UserMovie object and add it to the database
-                _context.UserMovies.Add(
+                await _userMovieRepository.CreateAsync(
                     new UserMovie
                     {
                         UserId = userId,
@@ -79,8 +75,7 @@ namespace Watchlist.Controllers
                 );
                 retval = 1;
             }
-            // now we can save the changes to the database
-            await _context.SaveChangesAsync();
+
             // and our return value (-1, 0, or 1) back to the script that called
             // this method from the Index page
             return Json(retval);
@@ -95,8 +90,7 @@ namespace Watchlist.Controllers
                 return NotFound();
             }
 
-            var movie = await _context.Movies
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var movie = await _movieRepository.GetMoviesAsync(id);
             if (movie == null)
             {
                 return NotFound();
@@ -122,8 +116,7 @@ namespace Watchlist.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(movie);
-                await _context.SaveChangesAsync();
+                await _movieRepository.CreateAsync(movie);
                 return RedirectToAction(nameof(Index));
             }
             return View(movie);
@@ -138,7 +131,7 @@ namespace Watchlist.Controllers
                 return NotFound();
             }
 
-            var movie = await _context.Movies.FindAsync(id);
+            var movie = await _movieRepository.GetMoviesAsync(id);
             if (movie == null)
             {
                 return NotFound();
@@ -163,12 +156,11 @@ namespace Watchlist.Controllers
             {
                 try
                 {
-                    _context.Update(movie);
-                    await _context.SaveChangesAsync();
+                    await _movieRepository.UpdateAsync(movie);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!MovieExists(movie.Id))
+                    if (!_movieRepository.MovieExists(movie.Id))
                     {
                         return NotFound();
                     }
@@ -191,8 +183,7 @@ namespace Watchlist.Controllers
                 return NotFound();
             }
 
-            var movie = await _context.Movies
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var movie = await _movieRepository.GetMoviesAsync(id);
             if (movie == null)
             {
                 return NotFound();
@@ -207,15 +198,10 @@ namespace Watchlist.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var movie = await _context.Movies.FindAsync(id);
-            _context.Movies.Remove(movie);
-            await _context.SaveChangesAsync();
+            var movie = await _movieRepository.GetMoviesAsync(id);
+            await _movieRepository.CreateAsync(movie);
             return RedirectToAction(nameof(Index));
         }
 
-        private bool MovieExists(int id)
-        {
-            return _context.Movies.Any(e => e.Id == id);
-        }
     }
 }
